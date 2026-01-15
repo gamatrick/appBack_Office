@@ -17,9 +17,9 @@
     <commands />
     <urls />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 5
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
   <component name="ProjectId" id="38HsUVkuy3p49y7PRn38YMHzDKh" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -36,7 +36,7 @@
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/valentin/Travail/SupdeVinci/Cours/Java/thes-manager",
+    "last_opened_file_path": "/home/valentin/Travail/SupdeVinci/éval/Java/appBack_Office",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -62,6 +62,7 @@
       <option name="presentableId" value="Default" />
       <updated>1768467847188</updated>
       <workItem from="1768467848378" duration="3611000" />
+      <workItem from="1768472567682" duration="466000" />
     </task>
     <servers />
   </component>
