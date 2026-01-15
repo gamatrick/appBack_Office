@@ -1,40 +1,57 @@
 package com.projet.controllers;
 
 import com.projet.entities.User;
-import com.projet.entities.Product;
 import com.projet.repository.UserRepository;
-import com.projet.repository.ProductRepository;
+import com.projet.security.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/admin")
-@PreAuthorize("hasRole('ADMIN')") // Protection globale pour ce contrôleur
-public class AdminController {
+@RequestMapping("/api/auth")
+public class AuthController {
 
-    @Autowired private UserRepository userRepository;
-    @Autowired private ProductRepository productRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    // Gestion des utilisateurs
-    @GetMapping("/users")
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    @Autowired
+    private PasswordEncoder encoder;
+
+    @Autowired
+    private JwtUtils jwtUtils;
+
+    // POST /api/auth/register - Inscription utilisateur
+    @PostMapping("/register")
+    public String register(@RequestBody User user) {
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            return "Erreur : Nom d'utilisateur déjà pris !";
+        }
+        user.setPassword(encoder.encode(user.getPassword()));
+        // Par défaut, on peut forcer le rôle USER si vide
+        if (user.getRoles() == null) user.setRoles("ROLE_USER");
+        user.setEnabled(true);
+        userRepository.save(user);
+        return "Utilisateur enregistré avec succès !";
     }
 
-    @PutMapping("/users/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User userDetails) {
-        User user = userRepository.findById(id).orElseThrow();
-        user.setRoles(userDetails.getRoles());
-        user.setEnabled(userDetails.isEnabled());
-        return userRepository.save(user);
-    }
+    // POST /api/auth/login - Connexion
+    @PostMapping("/login")
+    public Map<String, String> login(@RequestBody User user) {
+        User u = userRepository.findByUsername(user.getUsername())
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
 
-    // CRUD Produits (Exemple : Suppression)
-    @DeleteMapping("/products/{id}")
-    public void deleteProduct(@PathVariable Long id) {
-        productRepository.deleteById(id);
+        if (encoder.matches(user.getPassword(), u.getPassword())) {
+            String token = jwtUtils.generateToken(u.getUsername());
+            Map<String, String> response = new HashMap<>();
+            response.put("token", token);
+            response.put("username", u.getUsername());
+            response.put("role", u.getRoles());
+            return response;
+        } else {
+            throw new RuntimeException("Mot de passe incorrect");
+        }
     }
 }
