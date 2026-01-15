@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion - Mon Projet</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; background: #f4f4f4; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 300px; }
+        input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; }
+        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
+        #message { color: red; margin-top: 10px; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>Connexion</h2>
+    <input type="text" id="username" placeholder="Nom d'utilisateur">
+    <input type="password" id="password" placeholder="Mot de passe">
+    <button onclick="login()">Se connecter</button>
+    <p id="message"></p>
+</div>
+
+<script>
+    async function login() {
+        const user = {
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value
+        };
+
+        try {
+            const response = await fetch('http://localhost:8080/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(user)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // On stocke le token dans le navigateur
+                localStorage.setItem('token', data.token);
+                alert("Connexion réussie ! Token reçu.");
+                console.log("Token:", data.token);
+            } else {
+                document.getElementById('message').innerText = "Erreur: " + (data.message || "Identifiants invalides");
+            }
+        } catch (err) {
+            document.getElementById('message').innerText = "Serveur hors ligne ou erreur CORS";
+        }
+    }
+</script>
+</body>
+</html>

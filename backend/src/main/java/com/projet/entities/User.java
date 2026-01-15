@@ -13,7 +13,7 @@ public class User {
     private String username;
     private String email;
     private String password;
-    private String roles; // On stockera "ADMIN" ou "USER"
+    private String roles; // Stock "ADMIN" ou "USER"
     private boolean enabled = true;
     private LocalDateTime createdAt = LocalDateTime.now();
 }

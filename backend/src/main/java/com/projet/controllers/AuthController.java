@@ -1,47 +1,40 @@
 package com.projet.controllers;
 
 import com.projet.entities.User;
+import com.projet.entities.Product;
 import com.projet.repository.UserRepository;
-import com.projet.security.JwtUtils;
+import com.projet.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/auth")
-public class AuthController {
+@RequestMapping("/api/admin")
+@PreAuthorize("hasRole('ADMIN')") // Protection globale pour ce contrôleur
+public class AdminController {
 
-    @Autowired
-    private UserRepository userRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private ProductRepository productRepository;
 
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JwtUtils jwtUtils;
-
-    @PostMapping("/register")
-    public String register(@RequestBody User user) {
-        // On encode le mot de passe avant de sauvegarder
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        // Par défaut, on donne le rôle USER (en dur comme demandé)
-        if (user.getRoles() == null) user.setRoles("ROLE_USER");
-        userRepository.save(user);
-        return "Utilisateur enregistré avec succès !";
+    // Gestion des utilisateurs
+    @GetMapping("/users")
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
-    @PostMapping("/login")
-    public Map<String, String> login(@RequestBody User loginRequest) {
-        User user = userRepository.findByUsername(loginRequest.getUsername())
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+    @PutMapping("/users/{id}")
+    public User updateUser(@PathVariable Long id, @RequestBody User userDetails) {
+        User user = userRepository.findById(id).orElseThrow();
+        user.setRoles(userDetails.getRoles());
+        user.setEnabled(userDetails.isEnabled());
+        return userRepository.save(user);
+    }
 
-        if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            String token = jwtUtils.generateToken(user.getUsername());
-            return Map.of("token", token, "roles", user.getRoles());
-        } else {
-            throw new RuntimeException("Mot de passe incorrect");
-        }
+    // CRUD Produits (Exemple : Suppression)
+    @DeleteMapping("/products/{id}")
+    public void deleteProduct(@PathVariable Long id) {
+        productRepository.deleteById(id);
     }
 }

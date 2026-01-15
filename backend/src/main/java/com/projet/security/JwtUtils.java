@@ -10,7 +10,7 @@ import java.util.Date;
 public class JwtUtils {
     // Génère une clé sécurisée pour la signature HS256
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private final int jwtExpirationMs = 86400000; // Valide 24h
+    private final int jwtExpirationMs = 86400000;
 
     public String generateToken(String username) {
         return Jwts.builder()
