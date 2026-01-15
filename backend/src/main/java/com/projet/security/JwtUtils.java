@@ -12,7 +12,6 @@ public class JwtUtils {
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     private final int jwtExpirationMs = 86400000; // Valide 24h
 
-    // C'est cette méthode que ton AuthController cherche !
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
